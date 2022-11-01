@@ -28,29 +28,38 @@ module.exports = async function (fastify, opts) {
   const schema = {
     type: 'object',
     required: [ 
-      'WORKER_TIME_MS', 
-      'MS_REQUEST_DOMAIN', 
+      'WORKER_TIME_MS',
+      'WORKER_CREATE_ORDER_INTERVAL',
       'MS_REQUEST_TIMEOUT',
-      'MS_REQUEST_AUTH_HEADER_INDEX',
-      'MS_REQUEST_AUTH_HEADER_VALUE'
+      'MS_REQUEST_PAV2_DOMAIN', 
+      'MS_REQUEST_PAV2_AUTH_HEADER_INDEX',
+      'MS_REQUEST_PAV2_AUTH_HEADER_VALUE',
+      'MS_REQUEST_IC_DOMAIN'
     ],
     properties: {
       WORKER_TIME_MS: {
         type: 'number',
         default: 5000
       },
-      MS_REQUEST_DOMAIN: {
+      WORKER_CREATE_ORDER_INTERVAL: {
+        type: 'number',
+        default: 1
+      },
+      MS_REQUEST_PAV2_DOMAIN: {
         type: 'string',
       },
       MS_REQUEST_TIMEOUT: {
         type: 'number',
         default: 30000
       },
-      MS_REQUEST_AUTH_HEADER_INDEX: {
+      MS_REQUEST_PAV2_AUTH_HEADER_INDEX: {
         type: 'string',
         default: 'X-Authorization'
       },
-      MS_REQUEST_AUTH_HEADER_VALUE: {
+      MS_REQUEST_PAV2_AUTH_HEADER_VALUE: {
+        type: 'string',
+      },
+      MS_REQUEST_IC_DOMAIN: {
         type: 'string',
       }
     }
@@ -66,5 +75,7 @@ module.exports = async function (fastify, opts) {
     });
   
   setInterval(orderSevice.getOrders, process.env.WORKER_TIME_MS);
+
+  orderSevice.createOrderInterval()
 
 }

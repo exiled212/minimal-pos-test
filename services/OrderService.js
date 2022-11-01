@@ -2,6 +2,30 @@
 (async ()=>{
     const Logger = require('../config/Logger');
     const PaV2Request = require('../config/PaV2Request');
+    const ICRequest = require('../config/IntegrationCoreRequest');
+
+    async function createOrderIC(orderId, storeId){
+        try {
+            const body = {
+                "order_id":orderId,
+                "store_id":storeId
+            } 
+            ICRequest.post('/orders', body)
+                .then()
+                .catch(err=>console.log(err.message));
+        } catch (e) {
+            console.log(e.message)
+        }
+    }
+
+    function createOrderInterval(){
+        let i = 1;
+        setInterval(()=>{
+            createOrderIC(i, 900109448)
+            i++;
+        },
+        Math.round(1000/process.env.WORKER_CREATE_ORDER_INTERVAL))
+    }
 
     async function getOrders(){
         try{
@@ -63,7 +87,7 @@
         } catch(err){
             Logger.log({
                 level: 'error',
-                message: `[orderId: ${orderId}] Failed to take orders: ${err.message}`
+                message: `[orderId: ${orderId}] Failed to reject orders: ${err.message}`
             });
         }
     }
@@ -74,7 +98,7 @@
         } catch( err ){
             Logger.log({
                 level: 'error',
-                message: `[orderId: ${orderId}] Failed to take orders: ${err.message}`
+                message: `[orderId: ${orderId}] Failed to pickup orders: ${err.message}`
             });
         }
     }
@@ -92,7 +116,8 @@
 
     module.exports = {
         getOrder,
-        getOrders
+        getOrders,
+        createOrderInterval
     }
 
 })();

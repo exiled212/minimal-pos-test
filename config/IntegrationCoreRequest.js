@@ -2,13 +2,11 @@
 
     const moment = require('moment');
     const Properties = require('./Properties');
-    const Logger = require('../config/Logger');
+    const Logger = require('./Logger');
 
     const axios = require('axios');
-    const domain = Properties.pa_v2.domain;
-    const timeout = Properties.pa_v2.timeout;
-    const tokenIndex = Properties.pa_v2.headers.token.index;
-    const tokenValue = Properties.pa_v2.headers.token.value;
+    const domain = Properties.integration_core.domain;
+    const timeout = Properties.integration_core.timeout;
 
     let PaV2Request = axios.create({
         baseURL: domain,
@@ -17,9 +15,7 @@
 
     PaV2Request.interceptors.request.use((request)=>{
         let currentConfig = {
-            headers: {
-                [tokenIndex]: tokenValue
-            },
+            headers: {},
             metadata: {
                 startDate: moment()
             }
@@ -32,7 +28,9 @@
         const { baseURL, method, url, metadata } = config;
         const { startDate } = metadata;
         const endDate = moment();
-        Logger.info(`[Response] [Code: ${status}] [${method.toUpperCase()}] [milliseconds response time: ${endDate.diff(startDate)}] [Domain: ${baseURL} Endpoint: ${url}]`);
+        const timeMs = endDate.diff(startDate);
+        metadata.timeMs = timeMs;
+        Logger.info(`[Response] [Code: ${status}] [${method.toUpperCase()}] [milliseconds response time: ${timeMs}] [Domain: ${baseURL} Endpoint: ${url}]`);
         Logger.debug(`[Response] Body: ${JSON.stringify(data)}`);
         return response;
     });
